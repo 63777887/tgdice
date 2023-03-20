@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jwk.tgdice.biz.dao.DiceBetInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jwk.tgdice.biz.entity.DiceBetInfo">
+        <id column="id" property="id"/>
+        <result column="time_id" property="timeId"/>
+        <result column="bet_amount" property="betAmount"/>
+        <result column="amount_type_id" property="amountTypeId"/>
+        <result column="bet_type" property="betType"/>
+        <result column="play_type_id" property="playTypeId"/>
+        <result column="prize_id" property="prizeId"/>
+        <result column="bet_user_id" property="betUserId"/>
+        <result column="dice_user_name" property="diceUserName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <select id="getBetInfoListByTimeNo" resultType="com.jwk.tgdice.dto.DiceBetDto">
+        SELECT info.time_id,info.bet_amount,info.amount_type_id,info.bet_type,info.play_type_id,
+               info.prize_id,info.bet_user_id,info.dice_user_name,prize.prize_rate
+        FROM dice_bet_info info
+                 INNER JOIN dice ON info.time_id = dice.id
+                 INNER JOIN dice_prize prize ON info.prize_id = prize.id
+        WHERE dice.dice_date = #{diceDate}
+          AND dice.time_no = #{timeNo}
+    </select>
+
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jwk.tgdice.biz.dao.DicePrizeResultMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jwk.tgdice.biz.entity.DicePrizeResult">
+        <id column="id" property="id"/>
+        <result column="time_id" property="timeId"/>
+        <result column="prize_id" property="prizeId"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="getPrizeBet" resultType="com.jwk.tgdice.dto.DiceBetDto">
+        SELECT info.time_id,info.bet_amount,info.amount_type_id,info.bet_type,info.play_type_id,
+        info.prize_id,info.bet_user_id,info.dice_user_name,prize.prize_rate
+        FROM dice_bet_info info
+        INNER JOIN dice_prize_result result ON info.prize_id = result.prize_id AND info.time_id = result.time_id
+        INNER JOIN dice_prize prize ON info.prize_id = prize.id
+        where info.time_id = #{timeId,jdbcType=BIGINT}
+        <if test="userId != null">
+            and bet_user_id = #{userId,jdbcType=BIGINT},
+        </if>
+    </select>
+
+</mapper>

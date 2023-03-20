@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      #连接池初始化大小
+      initial-size: 5
+      #最大连接数
+      max-active: 20
+      #最小空闲连接数
+      min-idle: 10
+      stat-view-servlet:
+        #访问监控网页的登录用户名和密码
+        login-password: druid
+        login-username: druid
+      web-stat-filter:
+        #不统计这些请求数据
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+    # mysql配置
+    url: jdbc:mysql://1.13.159.90:3306/dice?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: Awert159
+
+mybatis-plus:
+  configuration:
+    # SQL查询超时时间(单位：秒)
+    default-statement-timeout: 15
+    # 开启驼峰命名法,数据库表与实体类属性的驼峰命名自动转换
+    map-underscore-to-camel-case: true
+  global-config:
+    # 关闭图标打印
+    banner: false
+    #dao层xml路径
+  mapper-locations:
+      - dao/*.xml
+  #  mapper-locations: classpath*:com/jwk/tgbot/biz/mapper/*.xml
+#  mapper-locations: com/jwk/tgbot/biz/mapper/*.xml
+  # config-location: classpath:mybatis-config.xml
+jwk:
+  bot:
+    bot-username: jiwkBot
+    bot-token: 5375857550:AAF8zkIiwB4dT0bQnW9uufPDV0rdr7xj-4E
+logging:
+  level:
+    com.jwk.tgdice.biz.dao: debug
