@@ -44,6 +44,7 @@ public class DuiZiRuleService implements RuleService {
                 }
             }
             message.delete(0, message.length()).append(findStr);
+            matcher = PlayTypeContent.PATTERN_DUIZI.matcher(message);
         }
         return betEntities;
     }

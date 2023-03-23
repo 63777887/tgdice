@@ -44,6 +44,7 @@ public class LongRuleService implements RuleService {
                 }
             }
             message.delete(0, message.length()).append(findStr);
+            matcher = PlayTypeContent.PATTERN_LONG.matcher(message);
         }
         return betEntities;
     }

@@ -26,6 +26,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
@@ -170,7 +175,26 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 diceService.save(newDice);
                 String sendText = newDice.getDiceDate() + String.format("%03d", newDice.getTimeNo()) + "期开始下注\n【开始下注】\n封盘时间: " + closeTime + "\n开奖时间: " + lotteryTime;
                 ClassPathResource classPathResource = new ClassPathResource("static/img/xiazhu.jpg");
-                telegramLongPollingBot.execute(SendPhoto.builder().caption(sendText).photo(new InputFile(classPathResource.getInputStream(), classPathResource.getFilename())).chatId(String.valueOf(groupId)).build());
+
+                // 创建键盘
+                InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+                List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+                List<InlineKeyboardButton> rowInline = new ArrayList<>();
+                InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+                inlineKeyboardButton.setText("余额");
+                inlineKeyboardButton.setCallbackData("balance");
+                rowInline.add(inlineKeyboardButton);
+
+                InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
+                inlineKeyboardButton1.setText("最近下注");
+                inlineKeyboardButton1.setCallbackData("flow");
+                rowInline.add(inlineKeyboardButton1);
+                rowsInline.add(rowInline);
+                markupInline.setKeyboard(rowsInline);
+
+                // 将键盘标记添加到发送消息对象中
+                SendPhoto photo = SendPhoto.builder().replyMarkup(markupInline).caption(sendText).photo(new InputFile(classPathResource.getInputStream(), classPathResource.getFilename())).chatId(String.valueOf(groupId)).build();
+                telegramLongPollingBot.execute(photo);
             }
         }
     }
@@ -254,7 +278,17 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 }
 
                 List<DiceBetDto> diceBetDtoList = dicePrizeResultService.getPrizeBet(dice.getId(), null);
-
+                Map<Long, List<DiceBetDto>> map = diceBetDtoList.stream().collect(Collectors.groupingBy(DiceBetDto::getBetUserId));
+                map.forEach((k,v)->{
+                    if (v.stream().anyMatch(t-> t.getBetType().equals(DicePrizeEnumsE.Meng.getCode()))) {
+                        v=v.stream().filter(t-> t.getBetType().equals(DicePrizeEnumsE.Meng.getCode())).collect(Collectors.toList());
+                        map.put(k,v);
+                    }
+                    if (v.stream().anyMatch(t-> t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode()))) {
+                        v=v.stream().filter(t-> t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode())).collect(Collectors.toList());
+                        map.put(k,v);
+                    }
+                });
                 SendMessage message = new SendMessage();
                 message.setChatId(String.valueOf(groupId));
                 //20230318683期开奖结果

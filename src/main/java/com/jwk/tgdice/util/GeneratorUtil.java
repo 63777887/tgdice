@@ -54,7 +54,8 @@ public class GeneratorUtil {
         pc.setMapper("mapper");
         mpg.setPackageInfo(pc);
         StrategyConfig strategy = new StrategyConfig();
-        strategy.setInclude(new String[]{"dice","dice_amount_type","dice_bet_info","dice_result","dice_play_type","dice_prize","dice_prize_result"});
+//        strategy.setInclude(new String[]{"dice","dice_amount_type","dice_bet_info","dice_result","dice_play_type","dice_prize","dice_prize_result"});
+        strategy.setInclude(new String[]{"dice_account"});
         strategy.setNaming(NamingStrategy.underline_to_camel);
         strategy.setTablePrefix(new String[]{pc.getModuleName() + "_"});
         strategy.setColumnNaming(NamingStrategy.underline_to_camel);
