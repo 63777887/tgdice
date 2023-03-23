@@ -44,6 +44,7 @@ public class DsRuleService implements RuleService {
                 }
             }
             message.delete(0, message.length()).append(findStr);
+            matcher = PlayTypeContent.PATTERN_SINGLE_BET.matcher(message.toString());
         }
         return betEntities;
     }
@@ -57,5 +58,4 @@ public class DsRuleService implements RuleService {
     public int order() {
         return 1;
     }
-
 }
