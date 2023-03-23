@@ -49,7 +49,6 @@ public class DreamRuleService implements RuleService {
                 }
             }
             message.delete(0, message.length()).append(findStr);
-            matcher = PlayTypeContent.PATTERN_DREAM_BET.matcher(message);
         }
         if (StrUtil.isNotBlank(message.toString())) {
             throw new BetMessageException();

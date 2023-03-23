@@ -58,6 +58,6 @@ public class TextRollDiceService implements ActionService {
 
     @Override
     public boolean support(Update update) {
-        return update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equals("掷骰子");
+        return update.getMessage().hasText() && update.getMessage().getText().equals("掷骰子");
     }
 }

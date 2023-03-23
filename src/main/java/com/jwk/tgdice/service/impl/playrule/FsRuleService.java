@@ -45,7 +45,6 @@ public class FsRuleService implements RuleService {
             }
 
             message.delete(0, message.length()).append(findStr);
-            matcher = PlayTypeContent.PATTERN_COMPOSITE_BET.matcher(message);
         }
         return betEntities;
     }

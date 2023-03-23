@@ -76,6 +76,6 @@ public class RollDiceService implements ActionService {
 
     @Override
     public boolean support(Update update) {
-        return update.hasMessage() && update.getMessage().hasDice();
+        return update.getMessage().hasDice();
     }
 }

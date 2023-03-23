@@ -17,18 +17,10 @@ import com.jwk.tgdice.exception.BetMessageException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.*;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalDateTime;
@@ -57,9 +49,6 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     @Autowired
     DicePrizeResultService dicePrizeResultService;
-
-    @Autowired
-    DiceAccountService diceAccountService;
 
     @Override
     public String getBotUsername() {
@@ -93,62 +82,6 @@ public class MyTelegramBot extends TelegramLongPollingBot {
             message.setText(messageText);
             sendMessage(message);
         }
-//        // 处理回调数据
-//        if (update.hasCallbackQuery()) {
-//            // 获取回调数据
-//            String callbackData = update.getCallbackQuery().getData();
-//            if (callbackData.equals("remainder")) {
-//                DiceAccount diceAccount = diceAccountService.lambdaQuery().eq(DiceAccount::getUserId, update.getCallbackQuery().getFrom().getId()).one();
-//                // 弹出一个列表框
-//                AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-//                answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
-//                answerCallbackQuery.setShowAlert(true);
-//                StringBuilder sendText = new StringBuilder();
-//                sendText.append("用户：").append(update.getCallbackQuery().getFrom().getFirstName()).append(update.getCallbackQuery().getFrom().getLastName()).append("\n余额：");
-//                if (BeanUtil.isNotEmpty(diceAccount)) {
-//                    sendText.append(diceAccount.getBalance()).append("\n流水：").append(diceAccount.getFlow());
-//                    // 发送消息
-//                } else {
-//                    sendText.append("0").append("\n流水：").append("0");
-//                    // 发送消息
-//                }
-//                answerCallbackQuery.setText(sendText.toString());
-//                super.execute(answerCallbackQuery);
-//            }
-//            if (callbackData.equals("flow")) {
-//                // 弹出一个列表框
-//                AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-//                answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
-//                answerCallbackQuery.setShowAlert(true);
-//                answerCallbackQuery.setText("期数\t\t\t\t\t\t投注\t\t\t\t\t\t金额\t\t\t\t\t\t赔付\n");
-//                // 发送消息
-//                super.execute(answerCallbackQuery);
-//            }
-//
-//        }
-//        if (update.hasMessage() && update.getMessage().getText().equals("test")) {
-//            // 创建键盘
-//            InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-//            List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-//            List<InlineKeyboardButton> rowInline = new ArrayList<>();
-//            InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-//            inlineKeyboardButton.setText("余额");
-//            inlineKeyboardButton.setCallbackData("remainder");
-//            rowInline.add(inlineKeyboardButton);
-//
-//            InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
-//            inlineKeyboardButton1.setText("最近下注");
-//            inlineKeyboardButton1.setCallbackData("recentlyBet");
-//            rowInline.add(inlineKeyboardButton1);
-//            rowsInline.add(rowInline);
-//            markupInline.setKeyboard(rowsInline);
-//            // 创建发送消息
-//            SendMessage message = new SendMessage();
-//            message.setChatId(update.getMessage().getChatId().toString());
-//            message.setText("Message text");
-//            message.setReplyMarkup(markupInline);
-//            super.execute(message);
-//        }
 //
 //        if (update.hasMessage() && update.getMessage().isGroupMessage()) {
 //            // 处理群聊消息
@@ -165,6 +98,10 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 //            }
 //        }
 
+        Message msg = update.getMessage();
+        Long chatId = msg.getChatId();
+        String content = msg.getText();
+        List<BetEntity> sendMessages = new ArrayList<>();
 
         Map<String, ActionService> actionServiceMap = SpringUtil.getBeansOfType(ActionService.class);
         actionServiceMap.values().stream().sorted(Comparator.comparing(ActionService::order).reversed())
@@ -180,10 +117,6 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                 );
 
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Message msg = update.getMessage();
-            Long chatId = msg.getChatId();
-            String content = msg.getText();
-            List<BetEntity> sendMessages = new ArrayList<>();
             Map<String, RuleService> ruleServiceMap = SpringUtil.getBeansOfType(RuleService.class);
             AtomicBoolean needSend = new AtomicBoolean(true);
             StringBuilder stringBuilder = new StringBuilder(content);
@@ -208,8 +141,8 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
             if (needSend.get() && CollUtil.isNotEmpty(sendMessages) && StrUtil.isBlank(stringBuilder.toString())) {
                 List<DicePrize> dicePrizeList = dicePrizeService.list();
-                Dice dice = diceService.lambdaQuery().eq(Dice::getGroupId, chatId).eq(Dice::getStatus, StatusE.Normal.getId()).one();
-                if (BeanUtil.isEmpty(dice)) {
+                Dice dice = diceService.lambdaQuery().eq(Dice::getGroupId,chatId).eq(Dice::getStatus, StatusE.Normal.getId()).one();
+                if (BeanUtil.isEmpty(dice)){
                     return;
                 }
                 SendMessage message = new SendMessage();
@@ -247,6 +180,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
             }
         }
     }
+
 
 
     //发送消息

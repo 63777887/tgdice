@@ -45,7 +45,6 @@ public class BaoRuleService implements RuleService {
                 }
             }
             message.delete(0, message.length()).append(findStr);
-            matcher = PlayTypeContent.PATTERN_BAOZI.matcher(message);
         }
         return betEntities;
     }
