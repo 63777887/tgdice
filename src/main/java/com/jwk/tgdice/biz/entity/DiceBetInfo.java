@@ -68,6 +68,11 @@ public class DiceBetInfo extends Model<DiceBetInfo> {
     private String diceUserName;
 
     /**
+     * 是否中奖
+     */
+    private Byte isPrize;
+
+    /**
      * createTime
      */
     private LocalDateTime createTime;

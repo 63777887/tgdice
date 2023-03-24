@@ -21,7 +21,12 @@ import java.util.List;
 public class DiceBetInfoServiceImpl extends ServiceImpl<DiceBetInfoMapper, DiceBetInfo> implements DiceBetInfoService {
 
     @Override
-    public List<DiceBetDto> getBetInfoListByTimeNo(String diceDate, Integer timeNo) {
-        return getBaseMapper().getBetInfoListByTimeNo(diceDate,timeNo);
+    public List<DiceBetDto> getBetInfoListByTimeNo(Long diceId) {
+        return getBaseMapper().getBetInfoListByTimeNo(diceId);
+    }
+
+    @Override
+    public List<DiceBetDto> getAllBetInfo(Long timeId, Long userId) {
+        return getBaseMapper().getAllBetInfo(timeId,userId);
     }
 }

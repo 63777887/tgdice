@@ -24,5 +24,7 @@ public interface DiceBetInfoMapper extends BaseMapper<DiceBetInfo> {
      */
     Integer insertBatchSomeColumn(Collection<DiceBetInfo> entityList);
 
-    List<DiceBetDto> getBetInfoListByTimeNo(String diceDate, Integer timeNo);
+    List<DiceBetDto> getBetInfoListByTimeNo(Long diceId);
+
+    List<DiceBetDto> getAllBetInfo(Long timeId, Long userId);
 }

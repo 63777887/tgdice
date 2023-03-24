@@ -4,15 +4,14 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.map.MapUtil;
 import com.jwk.tgdice.biz.dao.DicePrizeResultMapper;
-import com.jwk.tgdice.biz.entity.Dice;
-import com.jwk.tgdice.biz.entity.DicePrize;
-import com.jwk.tgdice.biz.entity.DicePrizeResult;
-import com.jwk.tgdice.biz.entity.DiceResult;
+import com.jwk.tgdice.biz.entity.*;
 import com.jwk.tgdice.biz.service.*;
 import com.jwk.tgdice.content.DiceCaCheContent;
 import com.jwk.tgdice.dto.DiceBetDto;
 import com.jwk.tgdice.enums.DicePrizeEnumsE;
+import com.jwk.tgdice.enums.IsPrizeEnumsE;
 import com.jwk.tgdice.enums.StatusE;
 import com.jwk.tgdice.service.DiceFlowService;
 import com.jwk.tgdice.util.DiceBetUtil;
@@ -27,13 +26,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +59,9 @@ public class DiceFlowServiceImpl implements DiceFlowService {
     TelegramLongPollingBot telegramLongPollingBot;
     @Autowired
     DiceBetInfoService diceBetInfoService;
+
+    @Autowired
+    DiceAccountService diceAccountService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -208,7 +208,7 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 if (BeanUtil.isEmpty(dice)) {
                     return;
                 }
-                List<DiceBetDto> diceBetInfoList = diceBetInfoService.getBetInfoListByTimeNo(DiceBetUtil.getDiceDate(), DiceBetUtil.getTimeNo());
+                List<DiceBetDto> diceBetInfoList = diceBetInfoService.getBetInfoListByTimeNo(dice.getId());
                 StringBuilder sendText = new StringBuilder("⛔️已封盘，停止下注！\n本期下注玩家:\n");
                 if (CollUtil.isNotEmpty(diceBetInfoList)) {
                     for (DiceBetDto diceBetDto : diceBetInfoList) {
@@ -280,11 +280,11 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 List<DiceBetDto> diceBetDtoList = dicePrizeResultService.getPrizeBet(dice.getId(), null);
                 Map<Long, List<DiceBetDto>> map = diceBetDtoList.stream().collect(Collectors.groupingBy(DiceBetDto::getBetUserId));
                 map.forEach((k,v)->{
-                    if (v.stream().anyMatch(t-> t.getBetType().equals(DicePrizeEnumsE.Meng.getCode()))) {
+                    if (v.stream().anyMatch(t-> t.getIsPrize().equals(IsPrizeEnumsE.IsPrize.getId()) &&t.getBetType().equals(DicePrizeEnumsE.Meng.getCode()))) {
                         v=v.stream().filter(t-> t.getBetType().equals(DicePrizeEnumsE.Meng.getCode())).collect(Collectors.toList());
                         map.put(k,v);
                     }
-                    if (v.stream().anyMatch(t-> t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode()))) {
+                    if (v.stream().anyMatch(t-> t.getIsPrize().equals(IsPrizeEnumsE.IsPrize.getId()) &&t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode()))) {
                         v=v.stream().filter(t-> t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode())).collect(Collectors.toList());
                         map.put(k,v);
                     }
@@ -299,9 +299,24 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 //二老板-6115272852 和值9 300(6倍率)
                 StringBuilder sendText = new StringBuilder(dice.getDiceDate() + String.format("%03d", dice.getTimeNo()) + "期开奖结果" + "\n" + result + "\n");
                 sendText.append("--------本期中奖玩家--------\n");
-                for (DiceBetDto diceBetDto : diceBetDtoList) {
-                    sendText.append(DiceBetUtil.getBetInfo(diceBetDto));
+                if (MapUtil.isNotEmpty(map)) {
+                    List<DiceAccount> diceAccountList = diceAccountService.lambdaQuery().in(DiceAccount::getUserId, map.keySet()).list();
+                    map.forEach((k, v) -> {
+                        BigDecimal total = new BigDecimal("0");
+                        for (DiceBetDto diceBetDto : v) {
+                            diceBetInfoService.lambdaUpdate().eq(DiceBetInfo::getId, diceBetDto.getId()).set(DiceBetInfo::getIsPrize, IsPrizeEnumsE.IsPrize.getId()).update();
+                            total = total.add(new BigDecimal(diceBetDto.getPrizeRate()).multiply(new BigDecimal(diceBetDto.getBetAmount())));
+                            sendText.append(DiceBetUtil.getBetInfo(diceBetDto));
+                        }
+                        for (DiceAccount diceAccount : diceAccountList) {
+                            if (diceAccount.getUserId().equals(k)) {
+                                diceAccountService.lambdaUpdate().set(DiceAccount::getBalance, diceAccount.getBalance().add(total)).eq(DiceAccount::getUserId, k).update();
+                                break;
+                            }
+                        }
+                    });
                 }
+
                 message.setText(sendText.toString());
                 ClassPathResource classPathResource = new ClassPathResource("static/img/gxzj.jpg");
                 SendPhoto sendPhoto = SendPhoto.builder().caption(sendText.toString()).photo(new InputFile(classPathResource.getInputStream(), classPathResource.getFilename())).chatId(String.valueOf(groupId)).build();

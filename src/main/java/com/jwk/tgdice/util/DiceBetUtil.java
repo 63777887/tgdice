@@ -8,8 +8,10 @@ import com.jwk.tgdice.biz.entity.DicePlayType;
 import com.jwk.tgdice.content.DiceCaCheContent;
 import com.jwk.tgdice.dto.DiceBetDto;
 import com.jwk.tgdice.enums.DicePrizeEnumsE;
+import com.jwk.tgdice.enums.IsPrizeEnumsE;
 import com.jwk.tgdice.exception.BetMessageException;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -24,11 +26,12 @@ public class DiceBetUtil {
 
     public static void checkPlayType(String playType) throws BetMessageException {
         DicePlayType dicePlayType = DiceCaCheContent.dicePlayTypeTypeCache.get(playType);
-        if (BeanUtil.isEmpty(dicePlayType)){
+        if (BeanUtil.isEmpty(dicePlayType)) {
             throw new BetMessageException("非法的玩法");
         }
     }
-    public static boolean strEquals(String str1,String str2) throws BetMessageException {
+
+    public static boolean strEquals(String str1, String str2) throws BetMessageException {
         // 将字符串转换为字符数组，然后排序
         char[] chars1 = str1.toCharArray();
         Arrays.sort(chars1);
@@ -43,19 +46,19 @@ public class DiceBetUtil {
     public static Integer getTimeNo() {
         // 将字符串转换为字符数组，然后排序
 
-        return Math.toIntExact(DateUtil.betweenMs(DateUtil.date(), DateUtil.beginOfDay(DateUtil.date())) / 1000 / 60 / 2)+1;
+        return Math.toIntExact(DateUtil.betweenMs(DateUtil.date(), DateUtil.beginOfDay(DateUtil.date())) / 1000 / 60 / 2) + 1;
     }
 
     public static DateTime getClosingTime() {
         // 将字符串转换为字符数组，然后排序
 
-        return DateUtil.offsetSecond(getLotteryTime(),-20);
+        return DateUtil.offsetSecond(getLotteryTime(), -20);
     }
 
     public static DateTime getLotteryTime() {
         // 将字符串转换为字符数组，然后排序
 
-        return DateUtil.offsetMinute(DateUtil.beginOfDay(DateUtil.date()),getTimeNo()*2);
+        return DateUtil.offsetMinute(DateUtil.beginOfDay(DateUtil.date()), getTimeNo() * 2);
     }
 
     public static String getDiceDate() {
@@ -66,6 +69,10 @@ public class DiceBetUtil {
 
     public static String getBetInfo(DiceBetDto diceBetDto) {
         return diceBetDto.getDiceUserName() + "-" + diceBetDto.getBetUserId() + " " + DicePrizeEnumsE.getValueByCode(diceBetDto.getBetType()) + "  " + diceBetDto.getBetAmount() + "(" + diceBetDto.getPrizeRate() + "倍率)\n";
+    }
+
+    public static String getBetFlowInfo(DiceBetDto diceBetDto) {
+        return DicePrizeEnumsE.getValueByCode(diceBetDto.getBetType()) + "\t" + diceBetDto.getBetAmount() + "(" + diceBetDto.getPrizeRate() + "倍率)" + "\t" + (diceBetDto.getIsPrize().equals(IsPrizeEnumsE.IsPrize.getId()) ? String.valueOf(new BigDecimal(diceBetDto.getPrizeRate()).multiply(new BigDecimal(diceBetDto.getBetAmount()))) : 0);
     }
 
     public static void main(String[] args) {

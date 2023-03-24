@@ -15,5 +15,7 @@ import java.util.List;
  * @since 2023-03-19
  */
 public interface DiceBetInfoService extends IService<DiceBetInfo> {
-    List<DiceBetDto> getBetInfoListByTimeNo(String diceDate, Integer timeNo);
+    List<DiceBetDto> getBetInfoListByTimeNo(Long diceId);
+
+    List<DiceBetDto> getAllBetInfo(Long timeId, Long userId);
 }

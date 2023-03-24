@@ -13,10 +13,26 @@ import java.time.LocalDateTime;
  */
 @Data
 public class DiceBetDto {
+
+    /**
+     * id
+     */
+    private Long id;
+
     /**
      * 期数id
      */
     private Long timeId;
+
+    /**
+     * 日期
+     */
+    private String diceDate;
+
+    /**
+     * 期数
+     */
+    private String timeNo;
 
     /**
      * 投注金额
@@ -52,6 +68,12 @@ public class DiceBetDto {
      * 掷骰子用户Name
      */
     private String diceUserName;
+
+
+    /**
+     * 是否中奖
+     */
+    private Byte isPrize;
 
     /**
      * 倍率

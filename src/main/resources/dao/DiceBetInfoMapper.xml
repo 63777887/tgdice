@@ -17,13 +17,41 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
     <select id="getBetInfoListByTimeNo" resultType="com.jwk.tgdice.dto.DiceBetDto">
-        SELECT info.time_id,info.bet_amount,info.amount_type_id,info.bet_type,info.play_type_id,
-               info.prize_id,info.bet_user_id,info.dice_user_name,prize.prize_rate
+        SELECT info.id,
+               info.time_id,
+               info.bet_amount,
+               info.amount_type_id,
+               info.bet_type,
+               info.play_type_id,
+               info.prize_id,
+               info.bet_user_id,
+               info.dice_user_name,
+               prize.prize_rate
         FROM dice_bet_info info
                  INNER JOIN dice ON info.time_id = dice.id
                  INNER JOIN dice_prize prize ON info.prize_id = prize.id
-        WHERE dice.dice_date = #{diceDate}
-          AND dice.time_no = #{timeNo}
+        WHERE info.time_id = #{diceId}
     </select>
+
+    <select id="getAllBetInfo" resultType="com.jwk.tgdice.dto.DiceBetDto">
+        SELECT dice.dice_date,dice.time_no,info.id,
+        info.time_id,info.bet_amount,info.amount_type_id,info.bet_type,info.play_type_id,
+        info.prize_id,info.bet_user_id,info.dice_user_name,info.is_prize,prize.prize_rate
+        FROM dice_bet_info info
+        INNER JOIN dice ON info.time_id = dice.id
+        LEFT JOIN dice_prize_result result ON info.prize_id = result.prize_id AND info.time_id = result.time_id
+        INNER JOIN dice_prize prize ON info.prize_id = prize.id
+        <where>
+            <if test="timeId != null">
+                and info.time_id = #{timeId,jdbcType=BIGINT}
+            </if>
+            <if test="userId != null">
+                and info.bet_user_id = #{userId,jdbcType=BIGINT}
+            </if>
+        </where>
+        ORDER BY info.id DESC
+        limit 0,4
+    </select>
+
 
 </mapper>

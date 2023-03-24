@@ -12,14 +12,14 @@
     </resultMap>
 
     <select id="getPrizeBet" resultType="com.jwk.tgdice.dto.DiceBetDto">
-        SELECT info.time_id,info.bet_amount,info.amount_type_id,info.bet_type,info.play_type_id,
-        info.prize_id,info.bet_user_id,info.dice_user_name,prize.prize_rate
+        SELECT info.id,info.time_id,info.bet_amount,info.amount_type_id,info.bet_type,info.play_type_id,
+        info.prize_id,info.bet_user_id,info.dice_user_name,info.is_prize,prize.prize_rate
         FROM dice_bet_info info
         INNER JOIN dice_prize_result result ON info.prize_id = result.prize_id AND info.time_id = result.time_id
         INNER JOIN dice_prize prize ON info.prize_id = prize.id
         where info.time_id = #{timeId,jdbcType=BIGINT}
         <if test="userId != null">
-            and bet_user_id = #{userId,jdbcType=BIGINT},
+            and info.bet_user_id = #{userId,jdbcType=BIGINT}
         </if>
     </select>
 

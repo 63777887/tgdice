@@ -12,6 +12,7 @@ import com.jwk.tgdice.config.TgProperties;
 import com.jwk.tgdice.content.DiceCaCheContent;
 import com.jwk.tgdice.entity.BetEntity;
 import com.jwk.tgdice.enums.DicePrizeEnumsE;
+import com.jwk.tgdice.enums.IsPrizeEnumsE;
 import com.jwk.tgdice.enums.StatusE;
 import com.jwk.tgdice.exception.BetMessageException;
 import lombok.SneakyThrows;
@@ -31,6 +32,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -75,9 +77,9 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().getChat().isGroupChat()) {
+        if (update.hasMessage() && (update.getMessage().getChat().isGroupChat() || update.getMessage().getChat().isSuperGroupChat())) {
             Long chatId = update.getMessage().getChat().getId();
-            if (!DiceCaCheContent.groupCache.contains(chatId)) {
+            if (update.getMessage().hasText() && update.getMessage().getText().equals("start") && !DiceCaCheContent.groupCache.contains(chatId)) {
                 DiceCaCheContent.groupCache.add(chatId);
             }
         }
@@ -208,6 +210,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
             if (needSend.get() && CollUtil.isNotEmpty(sendMessages) && StrUtil.isBlank(stringBuilder.toString())) {
                 List<DicePrize> dicePrizeList = dicePrizeService.list();
+                DiceAccount diceAccount = diceAccountService.lambdaQuery().eq(DiceAccount::getUserId, update.getMessage().getFrom().getId()).one();
                 Dice dice = diceService.lambdaQuery().eq(Dice::getGroupId, chatId).eq(Dice::getStatus, StatusE.Normal.getId()).one();
                 if (BeanUtil.isEmpty(dice)) {
                     return;
@@ -216,6 +219,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                 message.setChatId(chatId.toString());
                 StringBuilder messageText = new StringBuilder();
                 List<DiceBetInfo> diceBetInfos = new ArrayList<>();
+                Integer total = 0;
                 for (BetEntity sendMessage : sendMessages) {
 
                     DicePlayType dicePlayType = DiceCaCheContent.dicePlayTypeTypeCache.get(sendMessage.getPlayType());
@@ -227,6 +231,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                     diceBetInfo.setBetType(sendMessage.getBetType());
                     diceBetInfo.setPlayTypeId(dicePlayType.getId());
                     diceBetInfo.setAmountTypeId(1);
+                    diceBetInfo.setIsPrize(IsPrizeEnumsE.NoPrize.getId());
                     diceBetInfo.setTimeId(dice.getId());
                     for (DicePrize dicePrize : dicePrizeList) {
                         if (dicePrize.getPrizeCode().equals(sendMessage.getBetType())) {
@@ -236,14 +241,22 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                     diceBetInfo.setBetUserId(update.getMessage().getFrom().getId());
                     diceBetInfo.setCreateTime(LocalDateTime.now());
                     diceBetInfo.setDiceUserName(update.getMessage().getFrom().getFirstName() + update.getMessage().getFrom().getLastName());
+                    total += diceBetInfo.getBetAmount();
                     diceBetInfos.add(diceBetInfo);
                     messageText.append(sendMessage.getPlayType()).append(": ").append(DicePrizeEnumsE.getValueByCode(sendMessage.getBetType())).append(" ").append(sendMessage.getValue()).append(" 特殊值：").append(sendMessage.getSpecial() + "\n");
                 }
-                DiceBetInfoMapper baseMapper = (DiceBetInfoMapper) diceBetInfoService.getBaseMapper();
-                baseMapper.insertBatchSomeColumn(diceBetInfos);
-                message.setText(messageText.toString());
-                message.setReplyToMessageId(update.getMessage().getMessageId());
-                sendMessage(message);
+                if (BeanUtil.isNotEmpty(diceAccount) && diceAccount.getBalance().compareTo(new BigDecimal(total)) >= 0) {
+                    DiceBetInfoMapper baseMapper = (DiceBetInfoMapper) diceBetInfoService.getBaseMapper();
+                    baseMapper.insertBatchSomeColumn(diceBetInfos);
+                    message.setText(messageText.toString());
+                    message.setReplyToMessageId(update.getMessage().getMessageId());
+                    diceAccountService.lambdaUpdate().set(DiceAccount::getBalance, diceAccount.getBalance().subtract(new BigDecimal(total))).set(DiceAccount::getFlow, diceAccount.getFlow().add(new BigDecimal(total))).eq(DiceAccount::getId, diceAccount.getId()).update();
+                    sendMessage(message);
+                } else {
+                    message.setText("余额不足！");
+                    message.setReplyToMessageId(update.getMessage().getMessageId());
+                    sendMessage(message);
+                }
             }
         }
     }
