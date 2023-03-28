@@ -60,7 +60,7 @@ public class Test {
             amount = Integer.parseInt(matcher.group(2));
             System.out.printf(" bet: %s %d%n", play, amount);
         }
-         // 复式
+        // 复式
         matcher = PATTERN_COMPOSITE_BET.matcher(betString);
         while (matcher.find()) {
             System.out.printf("复式玩法");
@@ -72,12 +72,12 @@ public class Test {
         matcher = PATTERN_DREAM_BET.matcher(betString);
         while (matcher.find()) {
             String bei = matcher.group(1);
-            if ("0".equals(bei)){
+            if ("0".equals(bei)) {
                 System.out.printf("豹子玩法");
                 play = matcher.group(2);
                 amount = Integer.parseInt(matcher.group(3));
                 System.out.printf(" bet: %s %d%n", play, amount);
-            }else {
+            } else {
                 System.out.printf("梦幻玩法");
                 play = matcher.group(2);
                 amount = Integer.parseInt(matcher.group(3));

@@ -34,7 +34,7 @@ public class ButtonBalanceService implements ActionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void onMessage(Update update) throws BetMessageException, TelegramApiException {
-        DiceAccount diceAccount = diceAccountService.lambdaQuery().eq(DiceAccount::getUserId, update.getCallbackQuery().getFrom().getId()).one();
+        DiceAccount diceAccount = diceAccountService.lambdaQuery().eq(DiceAccount::getGroupId, update.getCallbackQuery().getMessage().getChat().getId()).eq(DiceAccount::getUserId, update.getCallbackQuery().getFrom().getId()).one();
         // 弹出一个列表框
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
         answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());

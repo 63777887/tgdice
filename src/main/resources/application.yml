@@ -31,9 +31,9 @@ mybatis-plus:
     banner: false
     #dao层xml路径
   mapper-locations:
-      - dao/*.xml
+    - dao/*.xml
   #  mapper-locations: classpath*:com/jwk/tgbot/biz/mapper/*.xml
-#  mapper-locations: com/jwk/tgbot/biz/mapper/*.xml
+  #  mapper-locations: com/jwk/tgbot/biz/mapper/*.xml
   # config-location: classpath:mybatis-config.xml
 jwk:
   bot:

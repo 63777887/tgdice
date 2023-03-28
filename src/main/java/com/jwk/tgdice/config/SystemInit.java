@@ -24,18 +24,17 @@ import java.util.List;
 public class SystemInit implements ApplicationRunner {
 
     @Autowired
-    private MyTelegramBot myTelegramBot;
-
-    @Autowired
     DicePlayTypeService dicePlayTypeService;
+    @Autowired
+    private MyTelegramBot myTelegramBot;
 
     @Override
     @SneakyThrows
     public void run(ApplicationArguments args) throws Exception {
         List<DicePlayType> playTypeList = dicePlayTypeService.list();
-        if (CollUtil.isNotEmpty(playTypeList)){
+        if (CollUtil.isNotEmpty(playTypeList)) {
             for (DicePlayType dicePlayType : playTypeList) {
-                DiceCaCheContent.dicePlayTypeTypeCache.put(dicePlayType.getPlayType(),dicePlayType);
+                DiceCaCheContent.dicePlayTypeTypeCache.put(dicePlayType.getPlayType(), dicePlayType);
             }
         }
         // Get the updates from Telegram

@@ -6,18 +6,8 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import com.jwk.tgdice.biz.dao.DicePrizeResultMapper;
-import com.jwk.tgdice.biz.entity.Dice;
-import com.jwk.tgdice.biz.entity.DiceAccount;
-import com.jwk.tgdice.biz.entity.DiceBetInfo;
-import com.jwk.tgdice.biz.entity.DicePrize;
-import com.jwk.tgdice.biz.entity.DicePrizeResult;
-import com.jwk.tgdice.biz.entity.DiceResult;
-import com.jwk.tgdice.biz.service.DiceAccountService;
-import com.jwk.tgdice.biz.service.DiceBetInfoService;
-import com.jwk.tgdice.biz.service.DicePrizeResultService;
-import com.jwk.tgdice.biz.service.DicePrizeService;
-import com.jwk.tgdice.biz.service.DiceResultService;
-import com.jwk.tgdice.biz.service.DiceService;
+import com.jwk.tgdice.biz.entity.*;
+import com.jwk.tgdice.biz.service.*;
 import com.jwk.tgdice.content.DiceCaCheContent;
 import com.jwk.tgdice.dto.DiceBetDto;
 import com.jwk.tgdice.enums.DicePrizeEnumsE;
@@ -25,12 +15,6 @@ import com.jwk.tgdice.enums.IsPrizeEnumsE;
 import com.jwk.tgdice.enums.StatusE;
 import com.jwk.tgdice.service.DiceFlowService;
 import com.jwk.tgdice.util.DiceBetUtil;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -44,6 +28,13 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Jiwk
@@ -86,64 +77,66 @@ public class DiceFlowServiceImpl implements DiceFlowService {
         List<DicePrizeResult> dicePrizes = new ArrayList<>();
         List<DicePrize> dicePrizeList = dicePrizeService.list();
         if (resultList.size() >= 3) {
-
             if (resultList.get(0).equals(resultList.get(2))) {
                 System.out.println("豹子");
                 prizeCodes.add(DicePrizeEnumsE.BaoZi.getCode());
                 prizeNames.add(DicePrizeEnumsE.BaoZi.getValue());
-            } else if (resultList.get(0) + 1 == resultList.get(1) && resultList.get(1) + 1 == resultList.get(2)) {
-                prizeCodes.add(DicePrizeEnumsE.ShunZi.getCode());
-                prizeNames.add(DicePrizeEnumsE.ShunZi.getValue());
-            } else if (resultList.get(0).equals(resultList.get(1)) || resultList.get(1).equals(resultList.get(2))) {
-                prizeCodes.add(DicePrizeEnumsE.DuiZi.getCode());
-                prizeNames.add(DicePrizeEnumsE.DuiZi.getValue());
             } else {
-                prizeCodes.add(DicePrizeEnumsE.Za.getCode());
-                prizeNames.add(DicePrizeEnumsE.Za.getValue());
-            }
-            if (diceResultList.get(0).getDiceResult() > diceResultList.get(2).getDiceResult()) {
-                prizeCodes.add(DicePrizeEnumsE.Long.getCode());
-                prizeNames.add(DicePrizeEnumsE.Long.getValue());
-            } else if (diceResultList.get(0).getDiceResult() < diceResultList.get(2).getDiceResult()) {
-                prizeCodes.add(DicePrizeEnumsE.Hu.getCode());
-                prizeNames.add(DicePrizeEnumsE.Hu.getValue());
-            } else if (diceResultList.get(0).getDiceResult().equals(diceResultList.get(2).getDiceResult())) {
-                prizeCodes.add(DicePrizeEnumsE.He.getCode());
-                prizeNames.add(DicePrizeEnumsE.He.getValue());
-            }
-            int sum = resultList.get(0) + resultList.get(1) + resultList.get(2);
-            // 此时三个骰子不是豹子也不是顺子，可以继续按照之前的方法输出“大”、“小”、“单”或“双”。
-            if (sum >= 10) {
-                System.out.print("大");
-                prizeCodes.add(DicePrizeEnumsE.Da.getCode());
-                prizeNames.add(DicePrizeEnumsE.Da.getValue());
-            } else {
-                prizeCodes.add(DicePrizeEnumsE.Xiao.getCode());
-                prizeNames.add(DicePrizeEnumsE.Xiao.getValue());
-            }
+                int sum = resultList.get(0) + resultList.get(1) + resultList.get(2);
+                // 此时三个骰子不是豹子也不是顺子，可以继续按照之前的方法输出“大”、“小”、“单”或“双”。
+                if (sum >= 10) {
+                    System.out.print("大");
+                    prizeCodes.add(DicePrizeEnumsE.Da.getCode());
+//                prizeNames.add(DicePrizeEnumsE.Da.getValue());
+                } else {
+                    prizeCodes.add(DicePrizeEnumsE.Xiao.getCode());
+//                prizeNames.add(DicePrizeEnumsE.Xiao.getValue());
+                }
 
-            if (sum % 2 == 0) {
-                prizeCodes.add(DicePrizeEnumsE.Shuang.getCode());
-                prizeNames.add(DicePrizeEnumsE.Shuang.getValue());
-            } else {
-                prizeCodes.add(DicePrizeEnumsE.Dan.getCode());
-                prizeNames.add(DicePrizeEnumsE.Dan.getValue());
-            }
-            if (prizeCodes.contains(DicePrizeEnumsE.Da.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Dan.getCode())) {
-                prizeCodes.add(DicePrizeEnumsE.DaDan.getCode());
-                prizeNames.add(DicePrizeEnumsE.DaDan.getValue());
-            }
-            if (prizeCodes.contains(DicePrizeEnumsE.Da.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Shuang.getCode())) {
-                prizeCodes.add(DicePrizeEnumsE.DaShuang.getCode());
-                prizeNames.add(DicePrizeEnumsE.DaShuang.getValue());
-            }
-            if (prizeCodes.contains(DicePrizeEnumsE.Xiao.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Dan.getCode())) {
-                prizeCodes.add(DicePrizeEnumsE.XiaoDan.getCode());
-                prizeNames.add(DicePrizeEnumsE.XiaoDan.getValue());
-            }
-            if (prizeCodes.contains(DicePrizeEnumsE.Xiao.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Shuang.getCode())) {
-                prizeCodes.add(DicePrizeEnumsE.XiaoShuang.getCode());
-                prizeNames.add(DicePrizeEnumsE.XiaoShuang.getValue());
+                if (sum % 2 == 0) {
+                    prizeCodes.add(DicePrizeEnumsE.Shuang.getCode());
+//                prizeNames.add(DicePrizeEnumsE.Shuang.getValue());
+                } else {
+                    prizeCodes.add(DicePrizeEnumsE.Dan.getCode());
+//                prizeNames.add(DicePrizeEnumsE.Dan.getValue());
+                }
+                if (prizeCodes.contains(DicePrizeEnumsE.Da.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Dan.getCode())) {
+                    prizeCodes.add(DicePrizeEnumsE.DaDan.getCode());
+                    prizeNames.add(DicePrizeEnumsE.DaDan.getValue());
+                }
+                if (prizeCodes.contains(DicePrizeEnumsE.Da.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Shuang.getCode())) {
+                    prizeCodes.add(DicePrizeEnumsE.DaShuang.getCode());
+                    prizeNames.add(DicePrizeEnumsE.DaShuang.getValue());
+                }
+                if (prizeCodes.contains(DicePrizeEnumsE.Xiao.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Dan.getCode())) {
+                    prizeCodes.add(DicePrizeEnumsE.XiaoDan.getCode());
+                    prizeNames.add(DicePrizeEnumsE.XiaoDan.getValue());
+                }
+                if (prizeCodes.contains(DicePrizeEnumsE.Xiao.getCode()) && prizeCodes.contains(DicePrizeEnumsE.Shuang.getCode())) {
+                    prizeCodes.add(DicePrizeEnumsE.XiaoShuang.getCode());
+                    prizeNames.add(DicePrizeEnumsE.XiaoShuang.getValue());
+                }
+
+                if (resultList.get(0) + 1 == resultList.get(1) && resultList.get(1) + 1 == resultList.get(2)) {
+                    prizeCodes.add(DicePrizeEnumsE.ShunZi.getCode());
+                    prizeNames.add(DicePrizeEnumsE.ShunZi.getValue());
+                } else if (resultList.get(0).equals(resultList.get(1)) || resultList.get(1).equals(resultList.get(2))) {
+                    prizeCodes.add(DicePrizeEnumsE.DuiZi.getCode());
+                    prizeNames.add(DicePrizeEnumsE.DuiZi.getValue());
+                } else {
+                    prizeCodes.add(DicePrizeEnumsE.Za.getCode());
+                    prizeNames.add(DicePrizeEnumsE.Za.getValue());
+                }
+                if (diceResultList.get(0).getDiceResult() > diceResultList.get(2).getDiceResult()) {
+                    prizeCodes.add(DicePrizeEnumsE.Long.getCode());
+                    prizeNames.add(DicePrizeEnumsE.Long.getValue());
+                } else if (diceResultList.get(0).getDiceResult() < diceResultList.get(2).getDiceResult()) {
+                    prizeCodes.add(DicePrizeEnumsE.Hu.getCode());
+                    prizeNames.add(DicePrizeEnumsE.Hu.getValue());
+                } else if (diceResultList.get(0).getDiceResult().equals(diceResultList.get(2).getDiceResult())) {
+                    prizeCodes.add(DicePrizeEnumsE.He.getCode());
+                    prizeNames.add(DicePrizeEnumsE.He.getValue());
+                }
             }
             for (String code : prizeCodes) {
                 for (DicePrize dicePrize : dicePrizeList) {
@@ -195,7 +188,7 @@ public class DiceFlowServiceImpl implements DiceFlowService {
 
                 InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
                 inlineKeyboardButton1.setText("最近下注");
-                inlineKeyboardButton1.setCallbackData("flow");
+                inlineKeyboardButton1.setCallbackData("latelyBet");
                 rowInline.add(inlineKeyboardButton1);
                 rowsInline.add(rowInline);
                 markupInline.setKeyboard(rowsInline);
@@ -216,7 +209,7 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 if (BeanUtil.isEmpty(dice)) {
                     return;
                 }
-                List<DiceBetDto> diceBetInfoList = diceBetInfoService.getBetInfoListByTimeNo(dice.getId());
+                List<DiceBetDto> diceBetInfoList = diceBetInfoService.getBetInfoListByTimeId(dice.getId());
                 StringBuilder sendText = new StringBuilder("⛔️已封盘，停止下注！\n本期下注玩家:\n");
                 if (CollUtil.isNotEmpty(diceBetInfoList)) {
                     for (DiceBetDto diceBetDto : diceBetInfoList) {
@@ -287,14 +280,14 @@ public class DiceFlowServiceImpl implements DiceFlowService {
 
                 List<DiceBetDto> diceBetDtoList = dicePrizeResultService.getPrizeBet(dice.getId(), null);
                 Map<Long, List<DiceBetDto>> map = diceBetDtoList.stream().collect(Collectors.groupingBy(DiceBetDto::getBetUserId));
-                map.forEach((k,v)->{
-                    if (v.stream().anyMatch(t-> t.getIsPrize().equals(IsPrizeEnumsE.IsPrize.getId()) &&t.getBetType().equals(DicePrizeEnumsE.Meng.getCode()))) {
-                        v=v.stream().filter(t-> t.getBetType().equals(DicePrizeEnumsE.Meng.getCode())).collect(Collectors.toList());
-                        map.put(k,v);
+                map.forEach((k, v) -> {
+                    if (v.stream().anyMatch(t -> t.getBetType().equals(DicePrizeEnumsE.Meng.getCode()))) {
+                        v = v.stream().filter(t -> t.getBetType().equals(DicePrizeEnumsE.Meng.getCode())).collect(Collectors.toList());
+                        map.put(k, v);
                     }
-                    if (v.stream().anyMatch(t-> t.getIsPrize().equals(IsPrizeEnumsE.IsPrize.getId()) &&t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode()))) {
-                        v=v.stream().filter(t-> t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode())).collect(Collectors.toList());
-                        map.put(k,v);
+                    if (v.stream().anyMatch(t -> t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode()))) {
+                        v = v.stream().filter(t -> t.getBetType().equals(DicePrizeEnumsE.BaoZi.getCode())).collect(Collectors.toList());
+                        map.put(k, v);
                     }
                 });
                 SendMessage message = new SendMessage();
@@ -308,7 +301,7 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 StringBuilder sendText = new StringBuilder(dice.getDiceDate() + String.format("%03d", dice.getTimeNo()) + "期开奖结果" + "\n" + result + "\n");
                 sendText.append("--------本期中奖玩家--------\n");
                 if (MapUtil.isNotEmpty(map)) {
-                    List<DiceAccount> diceAccountList = diceAccountService.lambdaQuery().in(DiceAccount::getUserId, map.keySet()).list();
+                    List<DiceAccount> diceAccountList = diceAccountService.lambdaQuery().eq(DiceAccount::getGroupId, groupId).in(DiceAccount::getUserId, map.keySet()).list();
                     map.forEach((k, v) -> {
                         BigDecimal total = new BigDecimal("0");
                         for (DiceBetDto diceBetDto : v) {
@@ -318,7 +311,7 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                         }
                         for (DiceAccount diceAccount : diceAccountList) {
                             if (diceAccount.getUserId().equals(k)) {
-                                diceAccountService.lambdaUpdate().set(DiceAccount::getBalance, diceAccount.getBalance().add(total)).eq(DiceAccount::getUserId, k).update();
+                                diceAccountService.lambdaUpdate().set(DiceAccount::getBalance, diceAccount.getBalance().add(total)).eq(DiceAccount::getId, diceAccount.getId()).update();
                                 break;
                             }
                         }
@@ -329,6 +322,21 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 ClassPathResource classPathResource = new ClassPathResource("static/img/gxzj.jpg");
                 SendPhoto sendPhoto = SendPhoto.builder().caption(sendText.toString()).photo(new InputFile(classPathResource.getInputStream(), classPathResource.getFilename())).chatId(String.valueOf(groupId)).build();
                 telegramLongPollingBot.execute(sendPhoto);
+
+                List<Dice> lastTwentyDice = diceService.lambdaQuery().eq(Dice::getGroupId, groupId).orderBy(true, false, Dice::getId).last("limit 0,20").list();
+                SendMessage sendMessage = new SendMessage();
+                StringBuilder historyPrizeText = new StringBuilder();
+
+                historyPrizeText.append("<pre style=\"color: rgb(18,115,145)\">--------历史开奖--------\n");
+                for (Dice diceDto : lastTwentyDice) {
+                    //20230325524期 5,4,6 大单|顺子|虎
+                    historyPrizeText.append(diceDto.getDiceDate()).append(diceDto.getTimeNo()).append("\t").append(diceDto.getResult()).append("\n");
+                }
+                historyPrizeText.append("</pre>");
+                sendMessage.setChatId(String.valueOf(groupId));
+                sendMessage.setText(historyPrizeText.toString());
+                sendMessage.setParseMode("html");
+                telegramLongPollingBot.execute(sendMessage);
             }
         }
     }

@@ -16,6 +16,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DiceAmountTypeServiceImpl extends
-    ServiceImpl<DiceAmountTypeMapper, DiceAmountType> implements DiceAmountTypeService {
+        ServiceImpl<DiceAmountTypeMapper, DiceAmountType> implements DiceAmountTypeService {
 
 }

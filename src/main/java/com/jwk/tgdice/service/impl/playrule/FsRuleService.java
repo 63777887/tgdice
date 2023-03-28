@@ -26,7 +26,7 @@ public class FsRuleService implements RuleService {
     @Override
     public List<BetEntity> onMessage(StringBuilder message, Update update) throws BetMessageException {
         List<BetEntity> betEntities = new ArrayList<>();
-        if (!support(message.toString())){
+        if (!support(message.toString())) {
             return betEntities;
         }
         Matcher matcher = PlayTypeContent.PATTERN_COMPOSITE_BET.matcher(message.toString());
@@ -34,11 +34,11 @@ public class FsRuleService implements RuleService {
             String findStr = matcher.replaceFirst("");
             String play = matcher.group(1) + matcher.group(2);
             Integer amount = Integer.parseInt(matcher.group(3));
-            if (amount<=0){
+            if (amount <= 0) {
                 return new ArrayList<>();
             }
             for (DicePrizeEnumsE prizeEnumsE : DicePrizeEnumsE.values()) {
-                if (DiceBetUtil.strEquals(prizeEnumsE.getValue(),play)){
+                if (DiceBetUtil.strEquals(prizeEnumsE.getValue(), play)) {
                     BetEntity betEntity = new BetEntity(null, prizeEnumsE.getCode(), PlayTypeContent.PLAY_TYPE_COMPOSITE, amount);
                     betEntities.add(betEntity);
                 }

@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Primary;
 public class MybatisPlusConfig {
 
 
-
     @Bean
     @Primary//批量插入配置
     public MySqlInjector mySqlInjector() {

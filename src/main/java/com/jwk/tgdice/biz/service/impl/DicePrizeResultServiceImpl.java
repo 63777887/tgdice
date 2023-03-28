@@ -5,8 +5,9 @@ import com.jwk.tgdice.biz.dao.DicePrizeResultMapper;
 import com.jwk.tgdice.biz.entity.DicePrizeResult;
 import com.jwk.tgdice.biz.service.DicePrizeResultService;
 import com.jwk.tgdice.dto.DiceBetDto;
-import java.util.List;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,10 +19,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DicePrizeResultServiceImpl extends
-    ServiceImpl<DicePrizeResultMapper, DicePrizeResult> implements DicePrizeResultService {
+        ServiceImpl<DicePrizeResultMapper, DicePrizeResult> implements DicePrizeResultService {
 
-  @Override
-  public List<DiceBetDto> getPrizeBet(Long timeId, Long userId) {
-    return baseMapper.getPrizeBet(timeId, userId);
-  }
+    @Override
+    public List<DiceBetDto> getPrizeBet(Long timeId, Long userId) {
+        return baseMapper.getPrizeBet(timeId, userId);
+    }
 }

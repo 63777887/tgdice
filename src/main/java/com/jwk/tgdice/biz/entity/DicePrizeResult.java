@@ -3,11 +3,12 @@ package com.jwk.tgdice.biz.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -22,35 +23,35 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class DicePrizeResult extends Model<DicePrizeResult> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @TableId(value = "id", type = IdType.AUTO)
-  private Long id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
-  /**
-   * 期数id
-   */
-  private Long timeId;
+    /**
+     * 期数id
+     */
+    private Long timeId;
 
-  /**
-   * 中奖类型Code
-   */
-  private Integer prizeId;
+    /**
+     * 中奖类型Code
+     */
+    private Integer prizeId;
 
-  /**
-   * updateTime
-   */
-  private Date updateTime;
+    /**
+     * updateTime
+     */
+    private Date updateTime;
 
-  /**
-   * createTime
-   */
-  private Date createTime;
+    /**
+     * createTime
+     */
+    private Date createTime;
 
 
-  @Override
-  protected Serializable pkVal() {
-    return this.id;
-  }
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 
 }

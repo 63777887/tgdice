@@ -9,30 +9,29 @@ package com.jwk.tgdice.exception;
  */
 public class BetMessageException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 
-	public BetMessageException(String msg) {
-		super(msg);
-	}
+    public BetMessageException(String msg) {
+        super(msg);
+    }
 
-	public BetMessageException() {
-		super("错误文本");
-	}
+    public BetMessageException() {
+        super("错误文本");
+    }
 
 
+    public BetMessageException(Throwable cause) {
+        super(cause);
+    }
 
-	public BetMessageException(Throwable cause) {
-		super(cause);
-	}
+    public BetMessageException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public BetMessageException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public BetMessageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    public BetMessageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
 
 }

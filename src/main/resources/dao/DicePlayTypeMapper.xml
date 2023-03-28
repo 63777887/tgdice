@@ -4,11 +4,11 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.jwk.tgdice.biz.entity.DicePlayType">
-        <id column="id" property="id" />
-        <result column="play_type" property="playType" />
-        <result column="play_rule" property="playRule" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="play_type" property="playType"/>
+        <result column="play_rule" property="playRule"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
 </mapper>

@@ -13,10 +13,11 @@
         <result column="prize_id" property="prizeId"/>
         <result column="bet_user_id" property="betUserId"/>
         <result column="dice_user_name" property="diceUserName"/>
+        <result column="is_prize" property="isPrize"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
-    <select id="getBetInfoListByTimeNo" resultType="com.jwk.tgdice.dto.DiceBetDto">
+    <select id="getBetInfoListByTimeId" resultType="com.jwk.tgdice.dto.DiceBetDto">
         SELECT info.id,
                info.time_id,
                info.bet_amount,
@@ -33,7 +34,7 @@
         WHERE info.time_id = #{diceId}
     </select>
 
-    <select id="getAllBetInfo" resultType="com.jwk.tgdice.dto.DiceBetDto">
+    <select id="getLastFourBetInfo" resultType="com.jwk.tgdice.dto.DiceBetDto">
         SELECT dice.dice_date,dice.time_no,info.id,
         info.time_id,info.bet_amount,info.amount_type_id,info.bet_type,info.play_type_id,
         info.prize_id,info.bet_user_id,info.dice_user_name,info.is_prize,prize.prize_rate
@@ -47,6 +48,9 @@
             </if>
             <if test="userId != null">
                 and info.bet_user_id = #{userId,jdbcType=BIGINT}
+            </if>
+            <if test="groupId != null">
+                and group_id = #{groupId,jdbcType=BIGINT}
             </if>
         </where>
         ORDER BY info.id DESC

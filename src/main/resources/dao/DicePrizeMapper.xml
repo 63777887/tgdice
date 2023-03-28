@@ -4,12 +4,12 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.jwk.tgdice.biz.entity.DicePrize">
-        <id column="id" property="id" />
-        <result column="prize_code" property="prizeCode" />
-        <result column="prize_value" property="prizeValue" />
-        <result column="prize_rate" property="prizeRate" />
-        <result column="update_time" property="updateTime" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="prize_code" property="prizeCode"/>
+        <result column="prize_value" property="prizeValue"/>
+        <result column="prize_rate" property="prizeRate"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
 
 </mapper>

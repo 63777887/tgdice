@@ -20,7 +20,7 @@ public interface RuleService {
 
     boolean support(String message);
 
-    default int order(){
+    default int order() {
         return 0;
     }
 }

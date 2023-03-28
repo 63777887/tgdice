@@ -4,13 +4,14 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.jwk.tgdice.biz.entity.DiceAccount">
-        <id column="id" property="id" />
-        <result column="user_id" property="userId" />
-        <result column="user_name" property="userName" />
-        <result column="flow" property="flow" />
-        <result column="balance" property="balance" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="flow" property="flow"/>
+        <result column="balance" property="balance"/>
+        <result column="group_id" property="groupId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
 </mapper>

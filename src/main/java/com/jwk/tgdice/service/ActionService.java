@@ -15,7 +15,7 @@ public interface ActionService {
 
     void onMessage(Update update) throws BetMessageException, TelegramApiException;
 
-    default int order(){
+    default int order() {
         return 0;
     }
 

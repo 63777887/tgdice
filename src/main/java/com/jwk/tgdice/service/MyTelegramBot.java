@@ -6,17 +6,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.jwk.tgdice.biz.dao.DiceBetInfoMapper;
-import com.jwk.tgdice.biz.entity.Dice;
-import com.jwk.tgdice.biz.entity.DiceAccount;
-import com.jwk.tgdice.biz.entity.DiceBetInfo;
-import com.jwk.tgdice.biz.entity.DicePlayType;
-import com.jwk.tgdice.biz.entity.DicePrize;
-import com.jwk.tgdice.biz.service.DiceAccountService;
-import com.jwk.tgdice.biz.service.DiceBetInfoService;
-import com.jwk.tgdice.biz.service.DicePrizeResultService;
-import com.jwk.tgdice.biz.service.DicePrizeService;
-import com.jwk.tgdice.biz.service.DiceResultService;
-import com.jwk.tgdice.biz.service.DiceService;
+import com.jwk.tgdice.biz.entity.*;
+import com.jwk.tgdice.biz.service.*;
 import com.jwk.tgdice.config.TgProperties;
 import com.jwk.tgdice.content.DiceCaCheContent;
 import com.jwk.tgdice.entity.BetEntity;
@@ -24,13 +15,6 @@ import com.jwk.tgdice.enums.DicePrizeEnumsE;
 import com.jwk.tgdice.enums.IsPrizeEnumsE;
 import com.jwk.tgdice.enums.StatusE;
 import com.jwk.tgdice.exception.BetMessageException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +25,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -83,7 +75,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && (update.getMessage().getChat().isGroupChat() || update.getMessage().getChat().isSuperGroupChat())) {
             Long chatId = update.getMessage().getChat().getId();
-            if (update.getMessage().hasText() && update.getMessage().getText().equals("start") && !DiceCaCheContent.groupCache.contains(chatId)) {
+            if (update.getMessage().hasText() && update.getMessage().getText().equals("/start") && !DiceCaCheContent.groupCache.contains(chatId)) {
                 DiceCaCheContent.groupCache.add(chatId);
             }
         }
@@ -214,7 +206,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
             if (needSend.get() && CollUtil.isNotEmpty(sendMessages) && StrUtil.isBlank(stringBuilder.toString())) {
                 List<DicePrize> dicePrizeList = dicePrizeService.list();
-                DiceAccount diceAccount = diceAccountService.lambdaQuery().eq(DiceAccount::getUserId, update.getMessage().getFrom().getId()).one();
+                DiceAccount diceAccount = diceAccountService.lambdaQuery().eq(DiceAccount::getGroupId, update.getMessage().getChat().getId()).eq(DiceAccount::getUserId, update.getMessage().getFrom().getId()).one();
                 Dice dice = diceService.lambdaQuery().eq(Dice::getGroupId, chatId).eq(Dice::getStatus, StatusE.Normal.getId()).one();
                 if (BeanUtil.isEmpty(dice)) {
                     return;

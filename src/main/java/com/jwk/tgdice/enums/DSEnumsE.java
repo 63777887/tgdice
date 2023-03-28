@@ -10,35 +10,38 @@ package com.jwk.tgdice.enums;
  */
 public enum DSEnumsE {
 
-	/** 单 */
-	Dan(1, "单"),
-	/** 双 */
-	Shuang(2, "双");
+    /**
+     * 单
+     */
+    Dan(1, "单"),
+    /**
+     * 双
+     */
+    Shuang(2, "双");
 
-	DSEnumsE(Integer id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    private final Integer id;
+    private final String name;
 
+    DSEnumsE(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-	public static boolean contains(String message) {
-		for (DSEnumsE enums : DSEnumsE.values()) {
-			if (message.contains(enums.name)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	private Integer id;
+    public static boolean contains(String message) {
+        for (DSEnumsE enums : DSEnumsE.values()) {
+            if (message.contains(enums.name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	private String name;
+    public Integer getId() {
+        return id;
+    }
 
-	public Integer getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
 }

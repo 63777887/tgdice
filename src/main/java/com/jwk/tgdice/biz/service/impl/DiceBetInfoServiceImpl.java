@@ -5,8 +5,9 @@ import com.jwk.tgdice.biz.dao.DiceBetInfoMapper;
 import com.jwk.tgdice.biz.entity.DiceBetInfo;
 import com.jwk.tgdice.biz.service.DiceBetInfoService;
 import com.jwk.tgdice.dto.DiceBetDto;
-import java.util.List;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,15 +19,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DiceBetInfoServiceImpl extends ServiceImpl<DiceBetInfoMapper, DiceBetInfo> implements
-    DiceBetInfoService {
+        DiceBetInfoService {
 
-  @Override
-  public List<DiceBetDto> getBetInfoListByTimeNo(Long diceId) {
-    return getBaseMapper().getBetInfoListByTimeNo(diceId);
-  }
+    @Override
+    public List<DiceBetDto> getBetInfoListByTimeId(Long diceId) {
+        return getBaseMapper().getBetInfoListByTimeId(diceId);
+    }
 
-  @Override
-  public List<DiceBetDto> getAllBetInfo(Long timeId, Long userId) {
-    return getBaseMapper().getAllBetInfo(timeId, userId);
-  }
+    @Override
+    public List<DiceBetDto> getLastFourBetInfo(Long timeId, Long userId, Long groupId) {
+        return getBaseMapper().getLastFourBetInfo(timeId, userId, groupId);
+    }
 }
