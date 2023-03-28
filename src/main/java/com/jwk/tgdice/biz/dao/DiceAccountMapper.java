@@ -1,7 +1,7 @@
 package com.jwk.tgdice.biz.dao;
 
-import com.jwk.tgdice.biz.entity.DiceAccount;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jwk.tgdice.biz.entity.DiceAccount;
 
 /**
  * <p>

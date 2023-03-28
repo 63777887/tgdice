@@ -1,8 +1,7 @@
 package com.jwk.tgdice.dto;
 
+import java.util.Date;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 /**
  * @author Jiwk
@@ -14,79 +13,79 @@ import java.time.LocalDateTime;
 @Data
 public class DiceBetDto {
 
-    /**
-     * id
-     */
-    private Long id;
+  /**
+   * id
+   */
+  private Long id;
 
-    /**
-     * 期数id
-     */
-    private Long timeId;
+  /**
+   * 期数id
+   */
+  private Long timeId;
 
-    /**
-     * 日期
-     */
-    private String diceDate;
+  /**
+   * 日期
+   */
+  private String diceDate;
 
-    /**
-     * 期数
-     */
-    private String timeNo;
+  /**
+   * 期数
+   */
+  private String timeNo;
 
-    /**
-     * 投注金额
-     */
-    private Integer betAmount;
+  /**
+   * 投注金额
+   */
+  private Integer betAmount;
 
-    /**
-     * 金额类型
-     */
-    private Integer amountTypeId;
+  /**
+   * 金额类型
+   */
+  private Integer amountTypeId;
 
-    /**
-     * 投注类型
-     */
-    private String betType;
+  /**
+   * 投注类型
+   */
+  private String betType;
 
-    /**
-     * 玩法类型
-     */
-    private Integer playTypeId;
+  /**
+   * 玩法类型
+   */
+  private Integer playTypeId;
 
-    /**
-     * 中奖类型Code
-     */
-    private Integer prizeId;
+  /**
+   * 中奖类型Code
+   */
+  private Integer prizeId;
 
-    /**
-     * 掷骰子用户id
-     */
-    private Long betUserId;
+  /**
+   * 掷骰子用户id
+   */
+  private Long betUserId;
 
-    /**
-     * 掷骰子用户Name
-     */
-    private String diceUserName;
+  /**
+   * 掷骰子用户Name
+   */
+  private String diceUserName;
 
 
-    /**
-     * 是否中奖
-     */
-    private Byte isPrize;
+  /**
+   * 是否中奖
+   */
+  private Byte isPrize;
 
-    /**
-     * 倍率
-     */
-    private String prizeRate;
+  /**
+   * 倍率
+   */
+  private String prizeRate;
 
-    /**
-     * createTime
-     */
-    private LocalDateTime createTime;
+  /**
+   * createTime
+   */
+  private Date createTime;
 
-    /**
-     * updateTime
-     */
-    private LocalDateTime updateTime;
+  /**
+   * updateTime
+   */
+  private Date updateTime;
 }

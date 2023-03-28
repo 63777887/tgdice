@@ -1,7 +1,7 @@
 package com.jwk.tgdice.biz.service;
 
-import com.jwk.tgdice.biz.entity.DiceAccount;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jwk.tgdice.biz.entity.DiceAccount;
 
 /**
  * <p>

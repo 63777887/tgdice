@@ -1,11 +1,11 @@
 package com.jwk.tgdice.biz.service;
 
-import com.jwk.tgdice.biz.entity.DiceAmountType;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jwk.tgdice.biz.entity.DiceAmountType;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author jiwk

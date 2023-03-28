@@ -1,6 +1,7 @@
 package com.jwk.tgdice.service.impl.action;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import com.jwk.tgdice.biz.entity.Dice;
 import com.jwk.tgdice.biz.entity.DiceResult;
 import com.jwk.tgdice.biz.service.DiceResultService;
@@ -17,8 +18,6 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.time.LocalDateTime;
 
 /**
  * @author Jiwk
@@ -65,7 +64,7 @@ public class RollDiceService implements ActionService {
                 diceResult.setDiceUserId(update.getMessage().getFrom().getId());
                 diceResult.setDiceUserName(update.getMessage().getFrom().getFirstName() + update.getMessage().getFrom().getLastName());
                 diceResult.setDiceResult(update.getMessage().getDice().getValue());
-                diceResult.setCreateTime(LocalDateTime.now());
+                diceResult.setCreateTime(DateUtil.date());
                 diceResultService.save(diceResult);
                 if (lastDiceResult != null && lastDiceResult.getDiceCount() == 2) {
                     diceFlowService.updateDicePrizeResult(dice);

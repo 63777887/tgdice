@@ -2,12 +2,21 @@ package com.jwk.tgdice.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import com.jwk.tgdice.biz.entity.*;
-import com.jwk.tgdice.biz.entity.Dice;
 import com.jwk.tgdice.biz.dao.DiceBetInfoMapper;
-import com.jwk.tgdice.biz.service.*;
+import com.jwk.tgdice.biz.entity.Dice;
+import com.jwk.tgdice.biz.entity.DiceAccount;
+import com.jwk.tgdice.biz.entity.DiceBetInfo;
+import com.jwk.tgdice.biz.entity.DicePlayType;
+import com.jwk.tgdice.biz.entity.DicePrize;
+import com.jwk.tgdice.biz.service.DiceAccountService;
+import com.jwk.tgdice.biz.service.DiceBetInfoService;
+import com.jwk.tgdice.biz.service.DicePrizeResultService;
+import com.jwk.tgdice.biz.service.DicePrizeService;
+import com.jwk.tgdice.biz.service.DiceResultService;
+import com.jwk.tgdice.biz.service.DiceService;
 import com.jwk.tgdice.config.TgProperties;
 import com.jwk.tgdice.content.DiceCaCheContent;
 import com.jwk.tgdice.entity.BetEntity;
@@ -15,28 +24,23 @@ import com.jwk.tgdice.enums.DicePrizeEnumsE;
 import com.jwk.tgdice.enums.IsPrizeEnumsE;
 import com.jwk.tgdice.enums.StatusE;
 import com.jwk.tgdice.exception.BetMessageException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.*;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -239,7 +243,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                         }
                     }
                     diceBetInfo.setBetUserId(update.getMessage().getFrom().getId());
-                    diceBetInfo.setCreateTime(LocalDateTime.now());
+                    diceBetInfo.setCreateTime(DateUtil.date());
                     diceBetInfo.setDiceUserName(update.getMessage().getFrom().getFirstName() + update.getMessage().getFrom().getLastName());
                     total += diceBetInfo.getBetAmount();
                     diceBetInfos.add(diceBetInfo);

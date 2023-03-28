@@ -3,11 +3,21 @@ package com.jwk.tgdice.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import com.jwk.tgdice.biz.dao.DicePrizeResultMapper;
-import com.jwk.tgdice.biz.entity.*;
-import com.jwk.tgdice.biz.service.*;
+import com.jwk.tgdice.biz.entity.Dice;
+import com.jwk.tgdice.biz.entity.DiceAccount;
+import com.jwk.tgdice.biz.entity.DiceBetInfo;
+import com.jwk.tgdice.biz.entity.DicePrize;
+import com.jwk.tgdice.biz.entity.DicePrizeResult;
+import com.jwk.tgdice.biz.entity.DiceResult;
+import com.jwk.tgdice.biz.service.DiceAccountService;
+import com.jwk.tgdice.biz.service.DiceBetInfoService;
+import com.jwk.tgdice.biz.service.DicePrizeResultService;
+import com.jwk.tgdice.biz.service.DicePrizeService;
+import com.jwk.tgdice.biz.service.DiceResultService;
+import com.jwk.tgdice.biz.service.DiceService;
 import com.jwk.tgdice.content.DiceCaCheContent;
 import com.jwk.tgdice.dto.DiceBetDto;
 import com.jwk.tgdice.enums.DicePrizeEnumsE;
@@ -15,6 +25,12 @@ import com.jwk.tgdice.enums.IsPrizeEnumsE;
 import com.jwk.tgdice.enums.StatusE;
 import com.jwk.tgdice.service.DiceFlowService;
 import com.jwk.tgdice.util.DiceBetUtil;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -28,14 +44,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Jiwk
@@ -143,7 +151,7 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                         DicePrizeResult dicePrizeResult = new DicePrizeResult();
                         dicePrizeResult.setTimeId(dice.getId());
                         dicePrizeResult.setPrizeId(dicePrize.getId());
-                        dicePrizeResult.setCreateTime(LocalDateTime.now());
+                        dicePrizeResult.setCreateTime(DateUtil.date());
                         dicePrizes.add(dicePrizeResult);
                     }
                 }
@@ -169,9 +177,9 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                 newDice.setDiceDate(DiceBetUtil.getDiceDate());
                 newDice.setStatus(StatusE.Normal.getId());
                 newDice.setTimeNo(DiceBetUtil.getTimeNo());
-                newDice.setCreateTime(LocalDateTime.now());
-                newDice.setClosingTime(LocalDateTimeUtil.of(closeTime));
-                newDice.setLotteryTime(LocalDateTimeUtil.of(lotteryTime));
+                newDice.setCreateTime(DateUtil.date());
+                newDice.setClosingTime(closeTime);
+                newDice.setLotteryTime(lotteryTime);
                 diceService.save(newDice);
                 String sendText = newDice.getDiceDate() + String.format("%03d", newDice.getTimeNo()) + "期开始下注\n【开始下注】\n封盘时间: " + closeTime + "\n开奖时间: " + lotteryTime;
                 ClassPathResource classPathResource = new ClassPathResource("static/img/xiazhu.jpg");
@@ -265,7 +273,7 @@ public class DiceFlowServiceImpl implements DiceFlowService {
                         diceResult.setTimeId(dice.getId());
                         diceResult.setDiceUserId(groupId);
                         diceResult.setDiceResult(execute.getDice().getValue());
-                        diceResult.setCreateTime(LocalDateTime.now());
+                        diceResult.setCreateTime(DateUtil.date());
                         diceResultService.save(diceResult);
                         if (i + count == 2) {
                             result = updateDicePrizeResult(dice);
